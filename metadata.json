@@ -1,0 +1,5 @@
+{
+  "name": "Sticker Grid Slicer",
+  "description": "A web tool to slice 4x6 (or custom grid) meme/sticker sheets into individual images and bundle them into a ZIP file.",
+  "requestFramePermissions": []
+}
