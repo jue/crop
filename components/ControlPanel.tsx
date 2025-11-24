@@ -114,7 +114,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
              onClick={() => onConfigChange({ cols: 4, rows: 6 })}
              className="px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition-colors"
            >
-             {t.default4x6}
+             {t.default6x4}
            </button>
            <button 
              onClick={() => onConfigChange({ cols: 3, rows: 3 })}

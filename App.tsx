@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GridConfig, ProcessingStatus } from './types';
 import { processAndZipImage } from './services/imageService';
 import GridPreview from './components/GridPreview';
 import ControlPanel from './components/ControlPanel';
-import { ScanFace, Languages } from 'lucide-react';
+import { ScanFace, ChevronDown } from 'lucide-react';
 
 export type Language = 'en' | 'zh';
 
@@ -19,7 +19,7 @@ export const translations = {
     gridSettings: '2. Grid Settings',
     columns: 'Columns (X)',
     rows: 'Rows (Y)',
-    default4x6: 'Default 4x6',
+    default6x4: 'Default 6x4',
     preset3x3: '3x3',
     processing: 'Processing...',
     working: 'Working...',
@@ -47,7 +47,7 @@ export const translations = {
     gridSettings: '2. 网格设置',
     columns: '列数 (X)',
     rows: '行数 (Y)',
-    default4x6: '默认 4x6',
+    default6x4: '默认 6x4',
     preset3x3: '3x3',
     processing: '处理中...',
     working: '处理中...',
@@ -68,12 +68,18 @@ export const translations = {
 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [config, setConfig] = useState<GridConfig>({ rows: 4, cols: 6 });
+  const [config, setConfig] = useState<GridConfig>({ rows: 6, cols: 4 });
   const [status, setStatus] = useState<ProcessingStatus>('idle');
   const [progress, setProgress] = useState(0);
   const [language, setLanguage] = useState<Language>('zh');
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
   const t = translations[language];
+
+  // Update page title when language changes
+  useEffect(() => {
+    document.title = t.title + ' | Sticker Grid Slicer';
+  }, [language, t.title]);
 
   const handleFileSelect = useCallback((selectedFile: File) => {
     setFile(selectedFile);
@@ -111,6 +117,7 @@ const App: React.FC = () => {
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'zh' : 'en');
+    setIsLangDropdownOpen(false);
   };
 
   return (
@@ -130,13 +137,35 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <button 
-              onClick={toggleLanguage}
-              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              <Languages size={16} />
-              {language === 'en' ? '中文' : 'English'}
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                {language === 'en' ? 'English' : '中文'}
+                <ChevronDown size={16} className={`transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isLangDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
+                  <button
+                    onClick={() => { setLanguage('zh'); setIsLangDropdownOpen(false); }}
+                    className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors rounded-t-lg ${
+                      language === 'zh' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600'
+                    }`}
+                  >
+                    中文
+                  </button>
+                  <button
+                    onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }}
+                    className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors rounded-b-lg ${
+                      language === 'en' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600'
+                    }`}
+                  >
+                    English
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="hidden md:block">
               <span className="px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-medium text-slate-500">
                 v1.0.0
@@ -146,10 +175,10 @@ const App: React.FC = () => {
         </header>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           
           {/* Left Panel: Controls */}
-          <div className="lg:col-span-4 order-2 lg:order-1 h-auto lg:h-[calc(100vh-12rem)] lg:min-h-[500px]">
+          <div className="lg:col-span-4 order-1">
              <ControlPanel 
                 onFileSelect={handleFileSelect}
                 config={config}
@@ -163,13 +192,13 @@ const App: React.FC = () => {
           </div>
 
           {/* Right Panel: Preview */}
-          <div className="lg:col-span-8 order-1 lg:order-2">
-             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[400px] flex items-center justify-center">
+          <div className="lg:col-span-8 order-2 flex flex-col gap-6">
+             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 flex-1 flex items-center justify-center">
                 <GridPreview file={file} config={config} t={t} />
              </div>
              
              {/* Instructions */}
-             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
                   <div className="text-blue-600 font-bold mb-1">{t.step1Title}</div>
                   <p className="text-sm text-slate-500">{t.step1Desc}</p>
@@ -186,6 +215,16 @@ const App: React.FC = () => {
           </div>
           
         </div>
+
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-slate-200">
+          <div className="flex justify-center items-center gap-2 text-sm text-slate-500">
+            <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+              <ScanFace size={14} />
+            </div>
+            <span>© 2025 Sticker Grid Slicer</span>
+          </div>
+        </footer>
       </div>
     </div>
   );
