@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GridConfig, ProcessingStatus } from './types';
 import { processAndZipImage } from './services/imageService';
+import { updateSEOMetadata, getLanguageFromURL, updateLanguageInURL, detectBrowserLanguage } from './services/seoService';
 import GridPreview from './components/GridPreview';
 import ControlPanel from './components/ControlPanel';
 import { ScanFace, ChevronDown } from 'lucide-react';
@@ -34,7 +35,19 @@ export const translations = {
     step2Desc: 'Set columns and rows. Standard WeChat/Telegram packs are often 4x6.',
     step3Title: '3. Download',
     step3Desc: 'Get a ZIP file containing all your cropped individual images.',
-    error: 'An error occurred while processing the image.'
+    error: 'An error occurred while processing the image.',
+    // SEO metadata
+    seo: {
+      title: 'Sticker Grid Slicer - Crop Sticker Sheets Instantly',
+      description: 'Free online sticker grid slicer tool. Quickly crop large sticker sheets into individual images. Supports custom grids, one-click ZIP download. All processing happens locally in your browser for privacy.',
+      keywords: 'sticker slicer,sticker crop,grid slicer,sticker tool,image crop,online slicer,sticker split,meme slicer',
+      ogTitle: 'Sticker Grid Slicer - Crop Sticker Sheets Instantly',
+      ogDescription: 'Free online sticker grid slicer tool. Quickly crop large sticker sheets into individual images. Supports custom grids, one-click ZIP download.',
+      twitterTitle: 'Sticker Grid Slicer - Crop Sticker Sheets Instantly',
+      twitterDescription: 'Free online sticker grid slicer tool. Quickly crop large sticker sheets into individual images.',
+      schemaName: 'Sticker Grid Slicer',
+      schemaDescription: 'Free online sticker grid slicer tool. Quickly crop large sticker sheets into individual images'
+    }
   },
   zh: {
     title: '表情包切图工具',
@@ -62,7 +75,19 @@ export const translations = {
     step2Desc: '设置列数和行数。微信/Telegram 表情包通常是 4x6。',
     step3Title: '3. 下载',
     step3Desc: '获取包含所有裁剪后独立图片的 ZIP 文件。',
-    error: '处理图片时发生错误。'
+    error: '处理图片时发生错误。',
+    // SEO metadata
+    seo: {
+      title: '表情包切图工具 - 快速裁剪表情包大图 | Sticker Grid Slicer',
+      description: '免费在线表情包切图工具,支持将大图表情包快速裁剪成独立的表情图片。支持自定义网格,一键下载ZIP文件。所有处理均在浏览器本地完成,保护您的隐私。',
+      keywords: '表情包切图,表情包裁剪,sticker slicer,表情包工具,图片切割,在线切图,表情包分割',
+      ogTitle: '表情包切图工具 - 快速裁剪表情包大图',
+      ogDescription: '免费在线表情包切图工具,支持将大图表情包快速裁剪成独立的表情图片。支持自定义网格,一键下载ZIP文件。',
+      twitterTitle: '表情包切图工具 - 快速裁剪表情包大图',
+      twitterDescription: '免费在线表情包切图工具,支持将大图表情包快速裁剪成独立的表情图片。',
+      schemaName: 'Sticker Grid Slicer',
+      schemaDescription: '免费在线表情包切图工具,支持将大图表情包快速裁剪成独立的表情图片'
+    }
   }
 };
 
@@ -71,15 +96,25 @@ const App: React.FC = () => {
   const [config, setConfig] = useState<GridConfig>({ rows: 6, cols: 4 });
   const [status, setStatus] = useState<ProcessingStatus>('idle');
   const [progress, setProgress] = useState(0);
-  const [language, setLanguage] = useState<Language>('zh');
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+
+  // 初始化语言: URL参数 > 浏览器语言 > 默认中文
+  const getInitialLanguage = (): Language => {
+    const urlLang = getLanguageFromURL();
+    if (urlLang === 'en' || urlLang === 'zh') {
+      return urlLang;
+    }
+    return detectBrowserLanguage();
+  };
+
+  const [language, setLanguage] = useState<Language>(getInitialLanguage);
 
   const t = translations[language];
 
-  // Update page title when language changes
+  // 更新SEO元数据当语言改变时
   useEffect(() => {
-    document.title = t.title + ' | Sticker Grid Slicer';
-  }, [language, t.title]);
+    updateSEOMetadata(t.seo, language);
+  }, [language, t.seo]);
 
   const handleFileSelect = useCallback((selectedFile: File) => {
     setFile(selectedFile);
@@ -116,7 +151,15 @@ const App: React.FC = () => {
   }, [file, config, t]);
 
   const toggleLanguage = () => {
-    setLanguage(prev => prev === 'en' ? 'zh' : 'en');
+    const newLang = language === 'en' ? 'zh' : 'en';
+    setLanguage(newLang);
+    updateLanguageInURL(newLang);
+    setIsLangDropdownOpen(false);
+  };
+
+  const handleLanguageChange = (newLang: Language) => {
+    setLanguage(newLang);
+    updateLanguageInURL(newLang);
     setIsLangDropdownOpen(false);
   };
 
@@ -148,7 +191,7 @@ const App: React.FC = () => {
               {isLangDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
                   <button
-                    onClick={() => { setLanguage('zh'); setIsLangDropdownOpen(false); }}
+                    onClick={() => handleLanguageChange('zh')}
                     className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors rounded-t-lg ${
                       language === 'zh' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600'
                     }`}
@@ -156,7 +199,7 @@ const App: React.FC = () => {
                     中文
                   </button>
                   <button
-                    onClick={() => { setLanguage('en'); setIsLangDropdownOpen(false); }}
+                    onClick={() => handleLanguageChange('en')}
                     className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition-colors rounded-b-lg ${
                       language === 'en' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600'
                     }`}

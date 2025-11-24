@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Chinese version -->
+  <url>
+    <loc>https://crop.nipao.com/?lang=zh</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://crop.nipao.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://crop.nipao.com/?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://crop.nipao.com/" />
+  </url>
+  
+  <!-- English version -->
+  <url>
+    <loc>https://crop.nipao.com/?lang=en</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://crop.nipao.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://crop.nipao.com/?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://crop.nipao.com/" />
+  </url>
+  
+  <!-- Default (auto-detect) -->
+  <url>
+    <loc>https://crop.nipao.com/</loc>
+    <lastmod>2025-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://crop.nipao.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://crop.nipao.com/?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://crop.nipao.com/" />
+  </url>
+  
+</urlset>
