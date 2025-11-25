@@ -111,7 +111,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         
         <div className="mt-4 flex gap-2">
            <button 
-             onClick={() => onConfigChange({ cols: 4, rows: 6 })}
+             onClick={() => onConfigChange({ cols: 6, rows: 4 })}
              className="px-3 py-1.5 text-xs font-medium bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition-colors"
            >
              {t.default6x4}
