@@ -90,7 +90,7 @@ export const translations = {
     step3Title: '3. 下载',
     step3Desc: '获取包含所有裁剪后独立图片的 ZIP 文件。',
     error: '处理图片时发生错误。',
-    copyright: '© nipao.com 版权所有。',
+    copyright: '© nipao.com 版权所有',
     // SEO metadata
     seo: {
       title: '表情包切图工具 - 快速裁剪表情包大图 | Sticker Grid Slicer',
@@ -307,12 +307,6 @@ const App: React.FC = () => {
               <Mail size={16} />
               <span className="hidden sm:inline">教育邮箱</span>
             </a>
-
-            <div className="hidden md:block">
-              <span className="px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-medium text-slate-500">
-                v1.0.0
-              </span>
-            </div>
           </div>
         </header>
 
