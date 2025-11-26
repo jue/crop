@@ -6,12 +6,15 @@
 
 This contains everything you need to run your app locally.
 
+## GitHub Repository
+
+You can find the source code for this project on GitHub: [https://github.com/jue/crop](https://github.com/jue/crop)
+
 View your app in AI Studio: https://ai.studio/apps/drive/1kmSSX-GbhOAurUNthoqclbmS4ExfzwB2
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js
 
 1. Install dependencies:
    `npm install`

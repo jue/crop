@@ -9,7 +9,7 @@ import {
 } from './services/seoService'
 import GridPreview from './components/GridPreview'
 import ControlPanel from './components/ControlPanel'
-import { ScanFace, ChevronDown } from 'lucide-react'
+import { ScanFace, ChevronDown, Github, Video, Mail } from 'lucide-react'
 
 export type Language = 'en' | 'zh'
 
@@ -44,6 +44,7 @@ export const translations = {
     step3Title: '3. Download',
     step3Desc: 'Get a ZIP file containing all your cropped individual images.',
     error: 'An error occurred while processing the image.',
+    copyright: '© nipao.com All rights reserved.',
     // SEO metadata
     seo: {
       title: 'Sticker Grid Slicer - Crop Sticker Sheets Instantly',
@@ -89,6 +90,7 @@ export const translations = {
     step3Title: '3. 下载',
     step3Desc: '获取包含所有裁剪后独立图片的 ZIP 文件。',
     error: '处理图片时发生错误。',
+    copyright: '© nipao.com 版权所有。',
     // SEO metadata
     seo: {
       title: '表情包切图工具 - 快速裁剪表情包大图 | Sticker Grid Slicer',
@@ -115,6 +117,13 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<ProcessingStatus>('idle')
   const [progress, setProgress] = useState(0)
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false)
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
+  const [imageSizes, setImageSizes] = useState<{
+    naturalWidth: number
+    naturalHeight: number
+    displayWidth: number
+    displayHeight: number
+  } | null>(null)
 
   // 初始化语言: URL参数 > 浏览器语言 > 默认中文
   const getInitialLanguage = (): Language => {
@@ -138,7 +147,28 @@ const App: React.FC = () => {
     setFile(selectedFile)
     setStatus('idle')
     setProgress(0)
+    // 重置图片位置
+    setImagePosition({ x: 0, y: 0 })
   }, [])
+
+  const handlePositionChange = useCallback(
+    (position: { x: number; y: number }) => {
+      setImagePosition(position)
+    },
+    []
+  )
+
+  const handleImageSizeChange = useCallback(
+    (sizes: {
+      naturalWidth: number
+      naturalHeight: number
+      displayWidth: number
+      displayHeight: number
+    }) => {
+      setImageSizes(sizes)
+    },
+    []
+  )
 
   const handleProcess = useCallback(async () => {
     if (!file) return
@@ -150,10 +180,16 @@ const App: React.FC = () => {
       // Small delay to let UI render the processing state
       await new Promise((resolve) => setTimeout(resolve, 100))
 
-      await processAndZipImage(file, config, (pct) => {
-        setProgress(pct)
-        if (pct > 50) setStatus('zipping')
-      })
+      await processAndZipImage(
+        file,
+        config,
+        imagePosition,
+        imageSizes,
+        (pct) => {
+          setProgress(pct)
+          if (pct > 50) setStatus('zipping')
+        }
+      )
 
       setStatus('done')
       setProgress(100)
@@ -161,11 +197,10 @@ const App: React.FC = () => {
       // Reset status after a delay so user sees "Done"
       setTimeout(() => setStatus('idle'), 2000)
     } catch (error) {
-      console.error(error)
       setStatus('error')
       alert(t.error)
     }
-  }, [file, config, t])
+  }, [file, config, t, imagePosition, imageSizes])
 
   const toggleLanguage = () => {
     const newLang = language === 'en' ? 'zh' : 'en'
@@ -236,6 +271,43 @@ const App: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* GitHub Link */}
+            <a
+              href="https://github.com/jue/crop"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+              title="View on GitHub"
+            >
+              <Github size={16} />
+              <span className="hidden sm:inline">GitHub</span>
+            </a>
+
+            {/* Douyin Video Downloader Link */}
+            <a
+              href="https://www.nipao.com/tools/douyin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-red-500 border-0 rounded-lg text-sm font-medium text-white hover:from-pink-600 hover:to-red-600 transition-all shadow-sm hover:shadow-md"
+              title="抖音无水印视频下载器"
+            >
+              <Video size={16} />
+              <span className="hidden sm:inline">抖音下载</span>
+            </a>
+
+            {/* Education Email Link */}
+            <a
+              href="https://get.joi.edu.kg/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 border-0 rounded-lg text-sm font-medium text-white hover:from-blue-600 hover:to-indigo-600 transition-all shadow-sm hover:shadow-md"
+              title="获取教育邮箱"
+            >
+              <Mail size={16} />
+              <span className="hidden sm:inline">教育邮箱</span>
+            </a>
+
             <div className="hidden md:block">
               <span className="px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-medium text-slate-500">
                 v1.0.0
@@ -263,7 +335,13 @@ const App: React.FC = () => {
           {/* Right Panel: Preview */}
           <div className="lg:col-span-8 order-2 flex flex-col gap-6">
             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 flex-1 flex items-center justify-center">
-              <GridPreview file={file} config={config} t={t} />
+              <GridPreview
+                file={file}
+                config={config}
+                t={t}
+                onPositionChange={handlePositionChange}
+                onImageSizeChange={handleImageSizeChange}
+              />
             </div>
 
             {/* Instructions */}
@@ -292,11 +370,8 @@ const App: React.FC = () => {
 
         {/* Footer */}
         <footer className="mt-12 pt-8">
-          <div className="flex justify-center items-center gap-2 text-sm text-slate-500">
-            <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-              <ScanFace size={14} />
-            </div>
-            <span>© 2025 Sticker Grid Slicer</span>
+          <div className="flex justify-center items-center gap-6 text-sm text-slate-500">
+            <span>{t.copyright}</span>
           </div>
         </footer>
       </div>
