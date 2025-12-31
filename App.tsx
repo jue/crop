@@ -222,7 +222,7 @@ const App: React.FC = () => {
         <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="size-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-              <img src="/jue.svg" alt="Logo" className="w-full h-full" />
+              <img src="./jue.svg" alt="Logo" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
